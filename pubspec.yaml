@@ -1,4 +1,4 @@
-name: kubectl_dashboard
+name: herd
 description: "A desktop dashboard for kubectl"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -42,7 +42,6 @@ dependencies:
   yaml: ^3.1.2
   yaml_writer: ^2.0.1
   shared_preferences: ^2.3.2
-  window_manager: ^0.4.3
   http: ^1.2.2
   json2yaml: ^3.0.1
   pluralize: ^0.0.8
@@ -51,10 +50,11 @@ dependencies:
   kuberneteslib:
     # git: https://github.com/m3talsmith/kuberneteslib.git
     path: ../kuberneteslib
-  shimmer: ^3.0.0
-  platform: ^3.1.6
-  localstorage: ^5.0.0
   flutter_staggered_grid_view: ^0.7.0
+  drift: ^2.23.1
+  drift_flutter: ^0.2.4
+  json_serializable: ^6.9.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +70,7 @@ dev_dependencies:
   build_runner: ^2.4.13
   custom_lint: ^0.7.0
   riverpod_lint: ^2.6.2
+  drift_dev: ^2.23.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -87,6 +88,9 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
+  assets:
+    - assets/images/
+  
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
