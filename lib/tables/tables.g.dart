@@ -11,13 +11,11 @@ class $ConfigsTableTable extends ConfigsTable
   $ConfigsTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -58,6 +56,8 @@ class $ConfigsTableTable extends ConfigsTable
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -87,13 +87,13 @@ class $ConfigsTableTable extends ConfigsTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => const {};
   @override
   ConfigsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ConfigsTableData(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       description: attachedDatabase.typeMapping
@@ -113,7 +113,7 @@ class $ConfigsTableTable extends ConfigsTable
 
 class ConfigsTableData extends DataClass
     implements Insertable<ConfigsTableData> {
-  final int id;
+  final String id;
   final String name;
   final String description;
   final String content;
@@ -127,7 +127,7 @@ class ConfigsTableData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['description'] = Variable<String>(description);
     map['content'] = Variable<String>(content);
@@ -149,7 +149,7 @@ class ConfigsTableData extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ConfigsTableData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String>(json['description']),
       content: serializer.fromJson<String>(json['content']),
@@ -160,7 +160,7 @@ class ConfigsTableData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String>(description),
       'content': serializer.toJson<String>(content),
@@ -169,7 +169,7 @@ class ConfigsTableData extends DataClass
   }
 
   ConfigsTableData copyWith(
-          {int? id,
+          {String? id,
           String? name,
           String? description,
           String? content,
@@ -218,33 +218,38 @@ class ConfigsTableData extends DataClass
 }
 
 class ConfigsTableCompanion extends UpdateCompanion<ConfigsTableData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> name;
   final Value<String> description;
   final Value<String> content;
   final Value<DateTime> createdAt;
+  final Value<int> rowid;
   const ConfigsTableCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     this.content = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ConfigsTableCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String name,
     required String description,
     required String content,
     this.createdAt = const Value.absent(),
-  })  : name = Value(name),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        name = Value(name),
         description = Value(description),
         content = Value(content);
   static Insertable<ConfigsTableData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? name,
     Expression<String>? description,
     Expression<String>? content,
     Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -252,21 +257,24 @@ class ConfigsTableCompanion extends UpdateCompanion<ConfigsTableData> {
       if (description != null) 'description': description,
       if (content != null) 'content': content,
       if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ConfigsTableCompanion copyWith(
-      {Value<int>? id,
+      {Value<String>? id,
       Value<String>? name,
       Value<String>? description,
       Value<String>? content,
-      Value<DateTime>? createdAt}) {
+      Value<DateTime>? createdAt,
+      Value<int>? rowid}) {
     return ConfigsTableCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
       content: content ?? this.content,
       createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -274,7 +282,7 @@ class ConfigsTableCompanion extends UpdateCompanion<ConfigsTableData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -288,6 +296,9 @@ class ConfigsTableCompanion extends UpdateCompanion<ConfigsTableData> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -298,7 +309,8 @@ class ConfigsTableCompanion extends UpdateCompanion<ConfigsTableData> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('content: $content, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -317,19 +329,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$ConfigsTableTableCreateCompanionBuilder = ConfigsTableCompanion
     Function({
-  Value<int> id,
+  required String id,
   required String name,
   required String description,
   required String content,
   Value<DateTime> createdAt,
+  Value<int> rowid,
 });
 typedef $$ConfigsTableTableUpdateCompanionBuilder = ConfigsTableCompanion
     Function({
-  Value<int> id,
+  Value<String> id,
   Value<String> name,
   Value<String> description,
   Value<String> content,
   Value<DateTime> createdAt,
+  Value<int> rowid,
 });
 
 class $$ConfigsTableTableFilterComposer
@@ -341,7 +355,7 @@ class $$ConfigsTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get name => $composableBuilder(
@@ -366,7 +380,7 @@ class $$ConfigsTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get name => $composableBuilder(
@@ -391,7 +405,7 @@ class $$ConfigsTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get name =>
@@ -433,11 +447,12 @@ class $$ConfigsTableTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$ConfigsTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String> description = const Value.absent(),
             Value<String> content = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               ConfigsTableCompanion(
             id: id,
@@ -445,13 +460,15 @@ class $$ConfigsTableTableTableManager extends RootTableManager<
             description: description,
             content: content,
             createdAt: createdAt,
+            rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
+            required String id,
             required String name,
             required String description,
             required String content,
             Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               ConfigsTableCompanion.insert(
             id: id,
@@ -459,6 +476,7 @@ class $$ConfigsTableTableTableManager extends RootTableManager<
             description: description,
             content: content,
             createdAt: createdAt,
+            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

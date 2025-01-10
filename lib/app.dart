@@ -1,53 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:herd/providers/configs.dart';
+import 'package:herd/views/config/update.dart';
 
+import 'app_theme_data.dart';
 import 'views/config/create.dart';
-import 'views/config/shared/app/scaffold.dart';
+import 'views/home/home.dart';
+import 'views/shared/app/scaffold.dart';
 
 class App extends ConsumerWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final size = MediaQuery.of(context).size;
+    final configs = ref.watch(configsProvider);
+
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Herd',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-      ),
-      home: Builder(builder: (context) {
-        return AppScaffold(
-          child: Center(
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('No cluster configs found.'),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FilledButton.icon(
-                        onPressed: () async {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ConfigCreate(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Cluster Config'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }),
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Herd',
+        theme: AppThemeData.theme,
+        home: Builder(builder: (context) => const HomeView()));
   }
 }

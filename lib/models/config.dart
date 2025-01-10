@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:drift/drift.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 import '../tables/tables.dart';
 
@@ -9,7 +10,7 @@ part 'config.g.dart';
 
 @JsonSerializable()
 class Config {
-  int? id;
+  String? id;
   String? name;
   String? description;
   String? content;
@@ -31,10 +32,11 @@ class Config {
   }
 
   Future<Config?> create() async {
-    log('[Config] create');
+    final id = const Uuid().v4();
     final result = await Config.db.configsTable
         .insert()
         .insertReturningOrNull(ConfigsTableCompanion(
+          id: Value(id),
           name: Value(name ?? ''),
           description: Value(description ?? ''),
           content: Value(content ?? ''),
@@ -63,5 +65,16 @@ class Config {
       ..where((tbl) => tbl.id.equals(id!));
     final result = await query.getSingleOrNull();
     return result == null ? null : Config.fromJson(result.toJson());
+  }
+
+  Future<void> delete() async {
+    final query = Config.db.configsTable.delete();
+    if (id != null) {
+      query.where((tbl) => tbl.id.equals(id!));
+    } else {
+      query.where((tbl) => tbl.name.equals(name!));
+    }
+
+    await query.go();
   }
 }

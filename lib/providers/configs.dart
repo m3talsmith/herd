@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:riverpod/riverpod.dart';
 
 import '../models/config.dart';
@@ -14,11 +16,8 @@ final refreshConfigsProvider = FutureProvider<void>((ref) async {
 final createConfigProvider =
     FutureProvider.autoDispose.family<Config?, Config>((ref, config) async {
   final savedConfig = await config.create();
-  if (savedConfig != null) {
-    await ref.read(refreshConfigsProvider.future);
-    return savedConfig;
-  }
-  return null;
+  await ref.read(refreshConfigsProvider.future);
+  return savedConfig;
 });
 
 final updateConfigProvider =
@@ -29,4 +28,12 @@ final updateConfigProvider =
     return updatedConfig;
   }
   return null;
+});
+
+final deleteConfigProvider =
+    FutureProvider.autoDispose.family<Config?, Config>((ref, config) async {
+  log('[deleteConfigProvider] ${config.toJson()}');
+  await config.delete();
+  await ref.read(refreshConfigsProvider.future);
+  return config;
 });
