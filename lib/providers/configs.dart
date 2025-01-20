@@ -1,39 +1,41 @@
-import 'dart:developer';
-
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/config.dart';
 
-final configsProvider = StateProvider<List<Config>>((ref) {
-  return [];
-});
+final configsProvider =
+    AutoDisposeAsyncNotifierProvider<ConfigsProvider, List<Config>>(
+        ConfigsProvider.new);
 
-final refreshConfigsProvider = FutureProvider<void>((ref) async {
-  final configs = await Config.load();
-  ref.read(configsProvider.notifier).state = configs;
-});
+class ConfigsProvider extends AutoDisposeAsyncNotifier<List<Config>> {
+  @override
+  Future<List<Config>> build() async {
+    return Config.findAll();
+  }
 
-final createConfigProvider =
-    FutureProvider.autoDispose.family<Config?, Config>((ref, config) async {
-  final savedConfig = await config.create();
-  await ref.read(refreshConfigsProvider.future);
-  return savedConfig;
-});
+  Future<List<Config>> refresh() async {
+    state = AsyncValue.data(Config.findAll());
+    return state.valueOrNull ?? [];
+  }
 
-final updateConfigProvider =
-    FutureProvider.autoDispose.family<Config?, Config>((ref, config) async {
-  final updatedConfig = await config.update();
-  if (updatedConfig != null) {
-    await ref.read(refreshConfigsProvider.future);
+  Future<Config?> createConfig(Config config) async {
+    final savedConfig = await config.create();
+    if (savedConfig != null) {
+      await refresh();
+    }
+    return savedConfig;
+  }
+
+  Future<Config?> updateConfig(Config config) async {
+    final updatedConfig = await config.update();
+    if (updatedConfig != null) {
+      await refresh();
+    }
     return updatedConfig;
   }
-  return null;
-});
 
-final deleteConfigProvider =
-    FutureProvider.autoDispose.family<Config?, Config>((ref, config) async {
-  log('[deleteConfigProvider] ${config.toJson()}');
-  await config.delete();
-  await ref.read(refreshConfigsProvider.future);
-  return config;
-});
+  Future<Config?> deleteConfig(Config config) async {
+    await config.delete();
+    await refresh();
+    return config;
+  }
+}

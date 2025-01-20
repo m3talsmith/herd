@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,7 +46,8 @@ class _ConfigFormState extends ConsumerState<ConfigForm> {
         ..name = _nameController.text
         ..description = _descriptionController.text
         ..content = _contentController.text;
-      config = await ref.read(updateConfigProvider(widget.config!).future);
+      config =
+          await ref.read(configsProvider.notifier).updateConfig(widget.config!);
       if (config == null) {
         messenger.showSnackBar(
           const SnackBar(content: Text('Failed to update config')),
@@ -57,7 +60,7 @@ class _ConfigFormState extends ConsumerState<ConfigForm> {
         description: _descriptionController.text,
         content: _contentController.text,
       );
-      config = await ref.read(createConfigProvider(newConfig).future);
+      config = await ref.read(configsProvider.notifier).createConfig(newConfig);
       if (config == null) {
         messenger.showSnackBar(
           const SnackBar(content: Text('Failed to create config')),

@@ -1,5 +1,7 @@
 import 'dart:io';
-import 'package:kuberneteslib/kuberneteslib.dart';
+import 'package:kuberneteslib/kuberneteslib.dart'
+    if (dart.io) 'package:kuberneteslib/kuberneteslib_io.dart'
+    if (dart.web) 'package:kuberneteslib/kuberneteslib_web.dart';
 import 'package:yaml/yaml.dart';
 import 'package:humanizer/humanizer.dart';
 

@@ -14,8 +14,8 @@ Config _$ConfigFromJson(Map<String, dynamic> json) => Config(
     );
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'description': instance.description,
-      'content': instance.content,
+      if (instance.id case final value?) 'id': value,
+      if (instance.name case final value?) 'name': value,
+      if (instance.description case final value?) 'description': value,
+      if (instance.content case final value?) 'content': value,
     };

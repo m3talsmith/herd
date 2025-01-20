@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,7 +12,6 @@ class ConfigUpdate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    log('[ConfigUpdate] build: ${config.toJson()}');
     return AppScaffold(
       title: 'Update ${config.name}',
       child: ConfigForm(config: config),

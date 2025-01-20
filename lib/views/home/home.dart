@@ -5,36 +5,86 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../../providers/configs.dart';
 import '../config/create.dart';
 import '../config/menu.dart';
+import '../config/view.dart';
+import '../shared/app/header_bar.dart';
+import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
+import '../shared/app/scaffold_container.dart';
 
-class HomeView extends ConsumerWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends ConsumerState<HomeView> {
+  @override
+  Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final configs = ref.watch(configsProvider);
+    final statuses = [];
 
     return AppScaffold(
       title: 'Home',
-      onRefresh: () => ref.read(refreshConfigsProvider),
-      child: configs.isNotEmpty
-          ? Column(
-              children: [
-                StaggeredGrid.count(
-                  crossAxisCount: size.width ~/ 300,
-                  children: configs
-                      .map((e) => Card(
-                            child: ListTile(
-                              title: Text(
-                                e.name!,
+      onRefresh: () => ref.read(configsProvider.notifier).refresh(),
+      child: configs.valueOrNull?.isNotEmpty ?? false
+          ? SizedBox(
+              height: size.height - 136,
+              child: Column(
+                children: [
+                  if (statuses.isNotEmpty)
+                    Expanded(
+                      flex: 3,
+                      child: ScaffoldContainer(
+                        child: Column(
+                          children: [
+                            Text('Statuses'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        HeaderBar(
+                          title: 'Clusters',
+                          action: HeaderBarAction(
+                            icon: Icons.add,
+                            label: 'Add Cluster Config',
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ConfigCreate(),
                               ),
-                              trailing: ConfigMenu(config: e),
                             ),
-                          ))
-                      .toList(),
-                ),
-              ],
+                          ),
+                        ),
+                        StaggeredGrid.count(
+                          crossAxisCount: size.width ~/ 300,
+                          children: configs.valueOrNull!
+                              .map((e) => ScaffoldListTile(
+                                    title: Text(
+                                      e.name!,
+                                    ),
+                                    trailing: ConfigMenu(config: e),
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ConfigView(
+                                          config: e,
+                                        ),
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             )
           : Center(
               child: Card(

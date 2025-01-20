@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../home/home.dart';
+
 class TopBarView extends ConsumerWidget {
   const TopBarView({
     super.key,
@@ -30,7 +32,7 @@ class TopBarView extends ConsumerWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardTheme.color,
-                borderRadius: BorderRadius.circular(16.0),
+                borderRadius: BorderRadius.circular(20.0),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.primary,
                   strokeAlign: BorderSide.strokeAlignOutside,
@@ -38,15 +40,17 @@ class TopBarView extends ConsumerWidget {
               ),
               child: Stack(
                 children: [
-                  if (canPop)
-                    IconButton(
-                      onPressed: () => navigator.pop(),
-                      icon: const Icon(Icons.arrow_back),
-                    ),
-                  if (onRefresh != null)
-                    IconButton(
-                      onPressed: () => onRefresh!(),
-                      icon: const Icon(Icons.refresh),
+                  if (title != null)
+                    Positioned(
+                      top:
+                          Theme.of(context).textTheme.titleLarge!.fontSize! / 4,
+                      left: 0,
+                      right: 0,
+                      child: Text(
+                        title!,
+                        style: Theme.of(context).textTheme.titleLarge,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   Positioned(
                     top: Theme.of(context).textTheme.titleLarge!.fontSize! / 4,
@@ -54,14 +58,6 @@ class TopBarView extends ConsumerWidget {
                     right: 0,
                     child: Row(
                       children: [
-                        const Spacer(),
-                        if (title != null)
-                          Text(
-                            title!,
-                            style: Theme.of(context).textTheme.titleLarge,
-                            textAlign: TextAlign.center,
-                          ),
-                        const Spacer(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
@@ -69,6 +65,28 @@ class TopBarView extends ConsumerWidget {
                         ),
                       ],
                     ),
+                  ),
+                  Row(
+                    children: [
+                      if (canPop)
+                        IconButton(
+                          onPressed: () => navigator.pop(),
+                          icon: const Icon(Icons.arrow_back),
+                        ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeView(),
+                          ),
+                        ),
+                        icon: const Icon(Icons.home_rounded),
+                      ),
+                      // if (onRefresh != null)
+                      //   IconButton(
+                      //     onPressed: () => onRefresh!(),
+                      //     icon: const Icon(Icons.refresh),
+                      //   ),
+                    ],
                   ),
                 ],
               ),

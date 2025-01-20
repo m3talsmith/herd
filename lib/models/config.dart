@@ -1,80 +1,186 @@
 import 'dart:developer';
 
-import 'package:drift/drift.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:uuid/uuid.dart';
+import '../storage/storage.dart';
+import 'cluster.dart';
+import 'context.dart';
+import 'user.dart';
+import 'status.dart';
 
-import '../tables/tables.dart';
+import 'package:json_annotation/json_annotation.dart' as json_annotation;
+import 'package:kuberneteslib/kuberneteslib_io.dart' as k8s;
+import 'package:uuid/uuid.dart';
+import 'package:yaml/yaml.dart' as yamlParser;
 
 part 'config.g.dart';
 
-@JsonSerializable()
+@json_annotation.JsonSerializable()
 class Config {
+  @json_annotation.JsonKey(includeIfNull: false)
   String? id;
+
+  @json_annotation.JsonKey(includeIfNull: false)
   String? name;
+
+  @json_annotation.JsonKey(includeIfNull: false)
   String? description;
+
+  @json_annotation.JsonKey(includeIfNull: false)
   String? content;
 
-  static late AppDatabase db;
+  @json_annotation.JsonKey(includeFromJson: false, includeToJson: false)
+  List<Cluster> clusters = [];
 
-  Config({this.id, this.name, this.description, this.content});
+  @json_annotation.JsonKey(includeFromJson: false, includeToJson: false)
+  List<ConfigContext> contexts = [];
 
-  static ensureInitializedWithDb(AppDatabase db) {
-    Config.db = db;
+  @json_annotation.JsonKey(includeFromJson: false, includeToJson: false)
+  List<User> users = [];
+
+  Config({this.id, this.name, this.description, this.content}) {
+    parseContent();
   }
 
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
   Map<String, dynamic> toJson() => _$ConfigToJson(this);
 
-  static Future<List<Config>> load() async {
-    final result = await Config.db.configsTable.all().get();
-    return result.map((e) => Config.fromJson(e.toJson())).toList();
+  static List<Config> findAll() {
+    final configs = Storage.configs;
+    configs.sort((a, b) => a.name!.compareTo(b.name!));
+    configs.forEach((config) {
+      config.parseContent();
+    });
+    return configs;
+  }
+
+  static Config? findById(String id) {
+    Config? config;
+    for (var c in Storage.configs) {
+      if (c.id == id) {
+        config = c;
+        break;
+      }
+    }
+    return config;
   }
 
   Future<Config?> create() async {
     final id = const Uuid().v4();
-    final result = await Config.db.configsTable
-        .insert()
-        .insertReturningOrNull(ConfigsTableCompanion(
-          id: Value(id),
-          name: Value(name ?? ''),
-          description: Value(description ?? ''),
-          content: Value(content ?? ''),
-        ));
-    log('[Config] create result: ${result?.toJson()}');
-    if (result != null) {
-      return Config.fromJson(result.toJson());
-    }
-    return null;
+    Storage.configs.add(
+        Config(id: id, name: name, description: description, content: content));
+    await Storage.saveConfigs();
+
+    return findById(id);
   }
 
   Future<Config?> update() async {
     if (id == null) return null;
 
-    final success =
-        await Config.db.configsTable.update().replace(ConfigsTableCompanion(
-              id: Value(id!),
-              name: Value(name ?? ''),
-              description: Value(description ?? ''),
-              content: Value(content ?? ''),
-            ));
+    Storage.configs.removeWhere((e) => e.id == id);
+    Storage.configs.add(
+        Config(id: id, name: name, description: description, content: content));
+    await Storage.saveConfigs();
 
-    if (!success) return null;
-
-    final query = Config.db.configsTable.select()
-      ..where((tbl) => tbl.id.equals(id!));
-    final result = await query.getSingleOrNull();
-    return result == null ? null : Config.fromJson(result.toJson());
+    return findById(id!);
   }
 
   Future<void> delete() async {
-    final query = Config.db.configsTable.delete();
-    if (id != null) {
-      query.where((tbl) => tbl.id.equals(id!));
-    } else {
-      query.where((tbl) => tbl.name.equals(name!));
+    Storage.configs.removeWhere((e) => e.id == id);
+    await Storage.saveConfigs();
+  }
+
+  parseContent() {
+    final data = yamlParser.loadYaml(content!);
+    final localClusters = <Cluster>[];
+    final localContexts = <ConfigContext>[];
+    final localUsers = <User>[];
+    for (var cluster in data['clusters']) {
+      final clusterMap = yamlToMap(cluster);
+      final clusterData = <String, dynamic>{};
+      clusterData['name'] = clusterMap['name'] ?? '';
+      clusterData['server'] = clusterMap['cluster']['server'] ?? '';
+      clusterData['certificateAuthorityData'] =
+          clusterMap['cluster']['certificate-authority-data'] ?? '';
+      localClusters.add(Cluster.fromJson(clusterData));
+    }
+    for (var context in data['contexts']) {
+      final contextMap = yamlToMap(context);
+      final contextData = <String, dynamic>{};
+      contextData['name'] = contextMap['name'] ?? '';
+      contextData['cluster'] = contextMap['context']['cluster'] ?? '';
+      contextData['user'] = contextMap['context']['user'] ?? '';
+      localContexts.add(ConfigContext.fromJson(contextData));
+    }
+    for (var user in data['users']) {
+      final userMap = yamlToMap(user);
+      final userData = <String, dynamic>{};
+      userData['name'] = userMap['name'] ?? '';
+      userData['clientCertificateData'] =
+          userMap['user']['client-certificate-data'] ?? '';
+      userData['clientKeyData'] = userMap['user']['client-key-data'] ?? '';
+      localUsers.add(User.fromJson(userData));
     }
 
-    await query.go();
+    clusters = localClusters;
+    contexts = localContexts;
+    users = localUsers;
+  }
+
+  Future<List<Status>> getStatuses() async {
+    final statuses = <Status>[];
+    for (var context in contexts) {
+      final k8sconfig = k8s.Config(
+        clusters: clusters
+            .map((e) => k8s.Cluster(
+                name: e.name,
+                server: e.server,
+                certificateAuthorityData: e.certificateAuthorityData))
+            .toList(),
+        users: users
+            .map((e) => k8s.User(
+                name: e.name,
+                clientCertificateData: e.clientCertificateData,
+                clientKeyData: e.clientKeyData))
+            .toList(),
+        contexts: contexts
+            .map((e) => k8s.Context(
+                name: e.name, cluster: e.clusterName, user: e.userName))
+            .toList(),
+      );
+
+      final auth = k8s.ClusterAuth.fromConfig(k8sconfig);
+      final url = Uri.parse(
+          clusters.firstWhere((e) => e.name == context.clusterName).server);
+      log('[Config] getStatuses url: $url');
+      // final response = await auth.get(url);
+      // log('[Config] getStatuses response: ${response.body}');
+      // final status = Status(name: context.name, status: response.body);
+      // statuses.add(status);
+    }
+    return statuses;
+  }
+
+  static Map<String, dynamic> yamlToMap(yamlParser.YamlMap yaml) {
+    final map = <String, dynamic>{};
+    for (var entry in yaml.entries) {
+      if (entry.value is yamlParser.YamlMap) {
+        map[entry.key.toString()] = yamlToMap(entry.value);
+      } else if (entry.value is yamlParser.YamlList) {
+        map[entry.key.toString()] = yamlListToList(entry.value);
+      } else {
+        map[entry.key.toString()] = entry.value;
+      }
+    }
+    return map;
+  }
+
+  static List<dynamic> yamlListToList(yamlParser.YamlList yamlList) {
+    return yamlList.map((item) {
+      if (item is yamlParser.YamlMap) {
+        return yamlToMap(item);
+      } else if (item is yamlParser.YamlList) {
+        return yamlListToList(item);
+      }
+      return item;
+    }).toList();
   }
 }

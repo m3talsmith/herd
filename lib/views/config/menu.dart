@@ -34,7 +34,7 @@ class ConfigMenu extends ConsumerWidget {
             textColor: Colors.red,
           ),
           onPressed: () async {
-            await ref.read(deleteConfigProvider(config).future);
+            await ref.read(configsProvider.notifier).deleteConfig(config);
           },
         ),
       ],
