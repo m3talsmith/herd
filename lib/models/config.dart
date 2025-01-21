@@ -7,7 +7,7 @@ import 'user.dart';
 import 'status.dart';
 
 import 'package:json_annotation/json_annotation.dart' as json_annotation;
-import 'package:kuberneteslib/kuberneteslib_io.dart' as k8s;
+import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
 import 'package:uuid/uuid.dart';
 import 'package:yaml/yaml.dart' as yamlParser;
 
@@ -35,6 +35,9 @@ class Config {
 
   @json_annotation.JsonKey(includeFromJson: false, includeToJson: false)
   List<User> users = [];
+
+  @json_annotation.JsonKey(includeFromJson: false, includeToJson: false)
+  String? currentContext;
 
   Config({this.id, this.name, this.description, this.content}) {
     parseContent();
@@ -88,8 +91,13 @@ class Config {
     await Storage.saveConfigs();
   }
 
+  get selectedContext => contexts.firstWhere((e) => e.name == currentContext);
+
   parseContent() {
     final data = yamlParser.loadYaml(content!);
+
+    log('data: ${data.keys}');
+
     final localClusters = <Cluster>[];
     final localContexts = <ConfigContext>[];
     final localUsers = <User>[];
@@ -119,6 +127,7 @@ class Config {
       userData['clientKeyData'] = userMap['user']['client-key-data'] ?? '';
       localUsers.add(User.fromJson(userData));
     }
+    currentContext = data['current-context'] ?? '';
 
     clusters = localClusters;
     contexts = localContexts;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:herd/providers/resources.dart';
 import 'package:herd/views/shared/app/scaffold_container.dart';
 import 'package:humanizer/humanizer.dart';
 import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
@@ -21,29 +22,53 @@ class ConfigContextView extends ConsumerStatefulWidget {
 }
 
 class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
-  bool _isExpanded = false;
-  int _selectedTabIndex = -1;
+  bool _isExpanded = true;
+  int _selectedTabIndex = 0;
+  List<String> _tabs = [];
 
   @override
-  Widget build(BuildContext context) {
-    final config = ref.watch(currentConfigProvider);
+  void initState() {
+    super.initState();
 
-    final user = widget.configContext.currentUser(config!).toK8sUser();
-    final cluster = widget.configContext.currentCluster(config).toK8sCluster();
-
-    final size = MediaQuery.of(context).size;
     final readKinds = k8s.ResourceKind.apiReadKinds;
     readKinds.sort((a, b) => a.name.compareTo(b.name));
 
-    final tabs = readKinds.map((e) {
+    _tabs = readKinds.map((e) {
       var parts = SymbolName(e.name).toHumanizedName().split(' ');
       parts = parts.map((e) => e.toSingularForm()).toList();
       parts.last = parts.last.toPluralForm();
       return parts.join(' ').toTitleCase();
     }).toList();
 
-    final formattedTabs = tabs.map((e) {
-      final index = tabs.indexOf(e);
+    // refreshResources();
+  }
+
+  refreshResources() async {
+    final config = ref.watch(currentConfigProvider);
+    final k8sConfig = config!.toK8sConfig();
+    final context = config.contextByName(widget.configContext.name);
+
+    var parts = _tabs[_selectedTabIndex].split(' ');
+    parts = parts.map((e) => e.toSingularForm().toTitleCase()).toList();
+    parts.first = parts.first.toLowerCase();
+    final resourceKindName = parts.join('');
+
+    final resourceKind = k8s.ResourceKind.fromString(resourceKindName);
+
+    await ref
+        .read(resourcesProvider.notifier)
+        .refreshResources(k8sConfig, context.name, resourceKind);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final resourcesResult = ref.watch(resourcesProvider);
+    final resources = resourcesResult.valueOrNull ?? [];
+
+    final size = MediaQuery.of(context).size;
+
+    final formattedTabs = _tabs.map((e) {
+      final index = _tabs.indexOf(e);
       final isSelected = _selectedTabIndex == index;
       return ScaffoldListTile(
         borderColor: isSelected ? Theme.of(context).colorScheme.primary : null,
@@ -58,15 +83,18 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
             } else {
               _isExpanded = true;
               _selectedTabIndex = index;
+              refreshResources();
             }
           });
         },
       );
     }).toList();
 
-    final selectedTab = _selectedTabIndex == -1
-        ? ''
-        : tabs[_selectedTabIndex].toString().toTitleCase();
+    final selectedTab = _tabs[_selectedTabIndex].toString().toTitleCase();
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      refreshResources();
+    });
 
     return AppScaffold(
       title:
@@ -113,10 +141,8 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
                           width: size.width * 0.7,
                           child: ListView(
                             shrinkWrap: true,
-                            children: [
-                              Text(user.name ?? ''),
-                              Text(cluster.name ?? ''),
-                            ],
+                            children:
+                                resources.map((e) => Text(e.kind!)).toList(),
                           ),
                         ),
                       ),

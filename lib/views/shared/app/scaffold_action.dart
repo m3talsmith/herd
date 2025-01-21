@@ -33,15 +33,12 @@ class ScaffoldAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = Theme.of(context).textTheme.titleLarge!.fontSize!;
-    final multiplier = fontSize / 2.5;
-    final width =
-        label != null ? (label!.length + 1) * multiplier : multiplier * 5;
     final height = fontSize + 10;
 
     return InkWell(
       onTap: onPressed,
       child: ScaffoldContainer(
-        width: width.toDouble(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         height: height,
         color: color ?? Colors.transparent,
         child: Row(

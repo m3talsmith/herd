@@ -531,7 +531,7 @@ packages:
       path: "../kuberneteslib"
       relative: true
     source: path
-    version: "0.8.10"
+    version: "0.8.16"
   leak_tracker:
     dependency: transitive
     description:
