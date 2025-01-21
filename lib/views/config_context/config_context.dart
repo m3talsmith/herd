@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:herd/views/shared/app/scaffold_container.dart';
 import 'package:humanizer/humanizer.dart';
 import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
@@ -20,8 +21,8 @@ class ConfigContextView extends ConsumerStatefulWidget {
 }
 
 class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
-  bool _isExpanded = true;
-  int _selectedTabIndex = 0;
+  bool _isExpanded = false;
+  int _selectedTabIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,7 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
     final size = MediaQuery.of(context).size;
     final readKinds = k8s.ResourceKind.apiReadKinds;
     readKinds.sort((a, b) => a.name.compareTo(b.name));
+
     final tabs = readKinds.map((e) {
       var parts = SymbolName(e.name).toHumanizedName().split(' ');
       parts = parts.map((e) => e.toSingularForm()).toList();
@@ -40,7 +42,31 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
       return parts.join(' ').toTitleCase();
     }).toList();
 
-    final selectedTab = tabs[_selectedTabIndex].toString().toTitleCase();
+    final formattedTabs = tabs.map((e) {
+      final index = tabs.indexOf(e);
+      final isSelected = _selectedTabIndex == index;
+      return ScaffoldListTile(
+        borderColor: isSelected ? Theme.of(context).colorScheme.primary : null,
+        textColor: isSelected ? Theme.of(context).colorScheme.onPrimary : null,
+        title: e,
+        tileColor: isSelected ? Theme.of(context).colorScheme.primary : null,
+        onTap: () {
+          setState(() {
+            if (isSelected) {
+              _isExpanded = false;
+              _selectedTabIndex = -1;
+            } else {
+              _isExpanded = true;
+              _selectedTabIndex = index;
+            }
+          });
+        },
+      );
+    }).toList();
+
+    final selectedTab = _selectedTabIndex == -1
+        ? ''
+        : tabs[_selectedTabIndex].toString().toTitleCase();
 
     return AppScaffold(
       title:
@@ -54,29 +80,15 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
           spacing: 16,
           children: [
             Expanded(
-              child: ListView(
-                shrinkWrap: true,
-                children: tabs.map((e) {
-                  final index = tabs.indexOf(e);
-                  final isSelected = _selectedTabIndex == index;
-                  return ScaffoldListTile(
-                    borderColor: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                    textColor: isSelected
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : null,
-                    title: e,
-                    tileColor: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                    onTap: () => setState(() {
-                      _isExpanded = true;
-                      _selectedTabIndex = index;
-                    }),
-                  );
-                }).toList(),
-              ),
+              child: !_isExpanded
+                  ? StaggeredGrid.count(
+                      crossAxisCount: size.width ~/ 300,
+                      children: formattedTabs,
+                    )
+                  : ListView(
+                      shrinkWrap: true,
+                      children: formattedTabs,
+                    ),
             ),
             if (_isExpanded)
               Expanded(
