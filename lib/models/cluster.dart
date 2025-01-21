@@ -1,3 +1,5 @@
+import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
+
 class Cluster {
   final String name;
   final String server;
@@ -13,6 +15,14 @@ class Cluster {
       name: json['name'],
       server: json['server'],
       certificateAuthorityData: json['certificateAuthorityData'],
+    );
+  }
+
+  k8s.Cluster toK8sCluster() {
+    return k8s.Cluster(
+      name: name,
+      server: server,
+      certificateAuthorityData: certificateAuthorityData,
     );
   }
 }

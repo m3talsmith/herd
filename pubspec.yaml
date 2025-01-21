@@ -45,7 +45,7 @@ dependencies:
   http: ^1.2.2
   json2yaml: ^3.0.1
   pluralize: ^0.0.8
-  humanizer: ^3.0.0
+  humanizer: ^3.0.1
   # kuberneteslib: ^0.6.0
   kuberneteslib:
     # git: https://github.com/m3talsmith/kuberneteslib.git

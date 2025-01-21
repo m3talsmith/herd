@@ -1,3 +1,7 @@
+import 'cluster.dart';
+import 'config.dart';
+import 'user.dart';
+
 class ConfigContext {
   final String name;
   final String clusterName;
@@ -12,5 +16,13 @@ class ConfigContext {
       clusterName: json['cluster'],
       userName: json['user'],
     );
+  }
+
+  User currentUser(Config config) {
+    return config.userByName(userName);
+  }
+
+  Cluster currentCluster(Config config) {
+    return config.clusterByName(clusterName);
   }
 }

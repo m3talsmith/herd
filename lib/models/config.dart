@@ -128,24 +128,7 @@ class Config {
   Future<List<Status>> getStatuses() async {
     final statuses = <Status>[];
     for (var context in contexts) {
-      final k8sconfig = k8s.Config(
-        clusters: clusters
-            .map((e) => k8s.Cluster(
-                name: e.name,
-                server: e.server,
-                certificateAuthorityData: e.certificateAuthorityData))
-            .toList(),
-        users: users
-            .map((e) => k8s.User(
-                name: e.name,
-                clientCertificateData: e.clientCertificateData,
-                clientKeyData: e.clientKeyData))
-            .toList(),
-        contexts: contexts
-            .map((e) => k8s.Context(
-                name: e.name, cluster: e.clusterName, user: e.userName))
-            .toList(),
-      );
+      final k8sconfig = toK8sConfig();
 
       final auth = k8s.ClusterAuth.fromConfig(k8sconfig);
       final url = Uri.parse(
@@ -157,6 +140,27 @@ class Config {
       // statuses.add(status);
     }
     return statuses;
+  }
+
+  k8s.Config toK8sConfig() {
+    return k8s.Config(
+      clusters: clusters
+          .map((e) => k8s.Cluster(
+              name: e.name,
+              server: e.server,
+              certificateAuthorityData: e.certificateAuthorityData))
+          .toList(),
+      users: users
+          .map((e) => k8s.User(
+              name: e.name,
+              clientCertificateData: e.clientCertificateData,
+              clientKeyData: e.clientKeyData))
+          .toList(),
+      contexts: contexts
+          .map((e) => k8s.Context(
+              name: e.name, cluster: e.clusterName, user: e.userName))
+          .toList(),
+    );
   }
 
   static Map<String, dynamic> yamlToMap(yamlParser.YamlMap yaml) {
@@ -182,5 +186,17 @@ class Config {
       }
       return item;
     }).toList();
+  }
+
+  User userByName(String name) {
+    return users.firstWhere((e) => e.name == name);
+  }
+
+  Cluster clusterByName(String name) {
+    return clusters.firstWhere((e) => e.name == name);
+  }
+
+  ConfigContext contextByName(String name) {
+    return contexts.firstWhere((e) => e.name == name);
   }
 }

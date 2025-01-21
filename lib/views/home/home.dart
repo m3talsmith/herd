@@ -34,7 +34,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: Column(
                 children: [
                   if (statuses.isNotEmpty)
-                    Expanded(
+                    const Expanded(
                       flex: 3,
                       child: ScaffoldContainer(
                         child: Column(
@@ -64,20 +64,27 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         StaggeredGrid.count(
                           crossAxisCount: size.width ~/ 300,
                           children: configs.valueOrNull!
-                              .map((e) => ScaffoldListTile(
-                                    title: Text(
-                                      e.name!,
-                                    ),
-                                    trailing: ConfigMenu(config: e),
-                                    onTap: () => Navigator.push(
-                                      context,
+                              .map(
+                                (e) => ScaffoldListTile(
+                                  title: Text(
+                                    e.name!,
+                                  ),
+                                  trailing: ConfigMenu(config: e),
+                                  onTap: () {
+                                    final navigator = Navigator.of(context);
+                                    ref
+                                        .read(currentConfigProvider.notifier)
+                                        .setConfig(e);
+                                    navigator.push(
                                       MaterialPageRoute(
                                         builder: (context) => ConfigView(
                                           config: e,
                                         ),
                                       ),
-                                    ),
-                                  ))
+                                    );
+                                  },
+                                ),
+                              )
                               .toList(),
                         ),
                       ],

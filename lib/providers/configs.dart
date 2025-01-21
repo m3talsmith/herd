@@ -39,3 +39,17 @@ class ConfigsProvider extends AutoDisposeAsyncNotifier<List<Config>> {
     return config;
   }
 }
+
+final currentConfigProvider =
+    NotifierProvider<CurrentConfigProvider, Config?>(CurrentConfigProvider.new);
+
+class CurrentConfigProvider extends Notifier<Config?> {
+  @override
+  Config? build() {
+    return null;
+  }
+
+  void setConfig(Config config) {
+    state = config;
+  }
+}

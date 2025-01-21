@@ -1,3 +1,5 @@
+import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
+
 class User {
   final String name;
   final String clientCertificateData;
@@ -13,6 +15,14 @@ class User {
       name: json['name'],
       clientCertificateData: json['clientCertificateData'],
       clientKeyData: json['clientKeyData'],
+    );
+  }
+
+  k8s.User toK8sUser() {
+    return k8s.User(
+      name: name,
+      clientCertificateData: clientCertificateData,
+      clientKeyData: clientKeyData,
     );
   }
 }
