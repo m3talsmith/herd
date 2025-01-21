@@ -4,6 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../models/config.dart';
 import '../config_context/config_context.dart';
+import '../shared/app/header_bar.dart';
 import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
 
@@ -22,22 +23,29 @@ class ConfigView extends ConsumerWidget {
       child: SizedBox(
         height: size.height - 136,
         width: size.width,
-        child: StaggeredGrid.count(
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          crossAxisCount: size.width ~/ 300,
-          children: contexts
-              .map((e) => ScaffoldListTile(
-                    title: e.name,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ConfigContextView(
-                          configContext: e,
+        child: Column(
+          children: [
+            const HeaderBar(
+              title: 'Contexts',
+            ),
+            StaggeredGrid.count(
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              crossAxisCount: size.width ~/ 300,
+              children: contexts
+                  .map((e) => ScaffoldListTile(
+                        title: e.name,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ConfigContextView(
+                              configContext: e,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ))
-              .toList(),
+                      ))
+                  .toList(),
+            ),
+          ],
         ),
       ),
     );

@@ -89,11 +89,12 @@ class TopBarView extends ConsumerWidget {
                     color: Colors.transparent,
                     child: Text(
                       title!,
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
                                 .onPrimary
                                 .withAlpha(150),
+                            fontWeight: FontWeight.normal,
                           ),
                       textAlign: TextAlign.right,
                     ),

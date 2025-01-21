@@ -5,6 +5,7 @@ import 'package:humanizer/humanizer.dart';
 import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
 import '../../models/context.dart';
 import '../../providers/configs.dart';
+import '../shared/app/header_bar.dart';
 import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
 
@@ -18,8 +19,8 @@ class ConfigContextView extends ConsumerStatefulWidget {
 }
 
 class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
-  bool _isExpanded = false;
-  int _selectedTabIndex = -1;
+  bool _isExpanded = true;
+  int _selectedTabIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +38,8 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
       parts.last = parts.last.toPluralForm();
       return parts.join(' ').toTitleCase();
     }).toList();
+
+    final selectedTab = tabs[_selectedTabIndex].toString().toTitleCase();
 
     return AppScaffold(
       title:
@@ -76,15 +79,29 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
             if (_isExpanded)
               Expanded(
                 flex: 3,
-                child: ScaffoldContainer(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.all(8),
-                  child: ListView(
-                    children: [
-                      Text(user.name ?? ''),
-                      Text(cluster.name ?? ''),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    HeaderBar(
+                      title: selectedTab,
+                    ),
+                    Expanded(
+                      child: ScaffoldContainer(
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.all(8),
+                        child: SizedBox(
+                          height: size.height - 106,
+                          width: size.width * 0.7,
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              Text(user.name ?? ''),
+                              Text(cluster.name ?? ''),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],
