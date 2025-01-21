@@ -7,6 +7,7 @@ import '../config_context/config_context.dart';
 import '../shared/app/header_bar.dart';
 import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
+import '../shared/app/scaffold_page_route_builder.dart';
 
 class ConfigView extends ConsumerWidget {
   const ConfigView({super.key, required this.config});
@@ -37,8 +38,10 @@ class ConfigView extends ConsumerWidget {
                   .map((e) => ScaffoldListTile(
                         title: e.name,
                         onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ConfigContextView(
+                          ScaffoldPageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    ConfigContextView(
                               configContext: e,
                             ),
                           ),

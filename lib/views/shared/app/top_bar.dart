@@ -26,13 +26,17 @@ class TopBarView extends ConsumerWidget {
 
     final listedActions = <Widget>[
       if (showBackButton!)
-        ScaffoldAction(
-          color: Theme.of(context).colorScheme.primary,
-          iconColor: Theme.of(context).colorScheme.onPrimary,
-          labelColor: Theme.of(context).colorScheme.onPrimary,
+        ScaffoldAction.primary(
+          context: context,
           icon: Icons.arrow_back,
           onPressed: () => navigator.pop(),
         ),
+      // if (onRefresh != null)
+      //   ScaffoldAction.primary(
+      //     context: context,
+      //     icon: Icons.refresh,
+      //     onPressed: () => onRefresh!(),
+      //   ),
       if (actions.isNotEmpty) ...actions,
     ];
 
@@ -73,11 +77,6 @@ class TopBarView extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      // if (onRefresh != null)
-                      //   IconButton(
-                      //     onPressed: () => onRefresh!(),
-                      //     icon: const Icon(Icons.refresh),
-                      //   ),
                     ],
                   ),
                 ),
