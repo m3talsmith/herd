@@ -10,37 +10,64 @@ class ScaffoldListTile extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onTap,
+    this.tileColor,
+    this.textColor,
+    this.borderColor,
   });
 
   final Widget? leading;
-  final Widget title;
-  final Widget? subtitle;
+  final String title;
+  final String? subtitle;
   final Widget? trailing;
   final VoidCallback? onTap;
+  final Color? tileColor;
+  final Color? textColor;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldContainer(
-      child: InkWell(
-        onTap: onTap,
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 32.0),
-              child: leading,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                title,
-                if (subtitle != null) subtitle!,
+      borderColor: borderColor,
+      margin: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+      color: tileColor,
+      child: SizedBox(
+        height: 40,
+        child: InkWell(
+          onTap: onTap,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (leading != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 32.0),
+                  child: leading,
+                ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: textColor,
+                        ),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: textColor,
+                          ),
+                    ),
+                ],
+              ),
+              if (trailing != null) ...[
+                const Spacer(),
+                trailing!,
               ],
-            ),
-            if (trailing != null) ...[
-              const Spacer(),
-              trailing!,
             ],
-          ],
+          ),
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:humanizer/humanizer.dart';
 import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
 import '../../models/context.dart';
 import '../../providers/configs.dart';
+import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
 
 class ConfigContextView extends ConsumerStatefulWidget {
@@ -41,7 +42,7 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
       title:
           SymbolName(widget.configContext.name).toHumanizedName().toTitleCase(),
       child: SizedBox(
-        height: size.height - 156,
+        height: size.height - 106,
         width: size.width,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,31 +54,21 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
                 children: tabs.map((e) {
                   final index = tabs.indexOf(e);
                   final isSelected = _selectedTabIndex == index;
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.surface
-                              : Theme.of(context).colorScheme.tertiaryContainer,
-                        ),
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context).colorScheme.surface,
-                      ),
-                      child: ListTile(
-                        title: Text(e),
-                        tileColor: isSelected
-                            ? Theme.of(context).colorScheme.onPrimaryContainer
-                            : null,
-                        onTap: () => setState(() {
-                          _isExpanded = true;
-                          _selectedTabIndex = index;
-                        }),
-                      ),
-                    ),
+                  return ScaffoldListTile(
+                    borderColor: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    textColor: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : null,
+                    title: e,
+                    tileColor: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    onTap: () => setState(() {
+                      _isExpanded = true;
+                      _selectedTabIndex = index;
+                    }),
                   );
                 }).toList(),
               ),
@@ -86,6 +77,8 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
               Expanded(
                 flex: 3,
                 child: ScaffoldContainer(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.all(8),
                   child: ListView(
                     children: [
                       Text(user.name ?? ''),

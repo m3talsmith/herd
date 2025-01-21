@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-const Color primaryColor = Color.fromARGB(255, 226, 130, 4);
-const Color secondaryColor = Color.fromARGB(255, 255, 224, 183);
-const Color tertiaryColor = Color.fromARGB(255, 1, 109, 77);
+const Color primaryColor = Color.fromRGBO(226, 130, 4, 1);
+const Color secondaryColor = Color.fromRGBO(255, 224, 183, 1);
+const Color tertiaryColor = Color.fromRGBO(0, 65, 45, 1);
 const Color containerColor = Color.fromRGBO(255, 255, 255, 0.85);
+final TextTheme textTheme = GoogleFonts.kanitTextTheme();
 
 class AppThemeData {
   static ThemeData get theme => ThemeData(
@@ -40,5 +42,6 @@ class AppThemeData {
         dialogTheme: const DialogTheme(
           backgroundColor: containerColor,
         ),
+        textTheme: textTheme,
       );
 }

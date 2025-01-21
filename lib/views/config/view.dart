@@ -25,10 +25,10 @@ class ConfigView extends ConsumerWidget {
         child: StaggeredGrid.count(
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          crossAxisCount: size.width ~/ 250,
+          crossAxisCount: size.width ~/ 300,
           children: contexts
               .map((e) => ScaffoldListTile(
-                    title: Text(e.name),
+                    title: e.name,
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => ConfigContextView(

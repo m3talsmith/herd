@@ -9,7 +9,9 @@ import '../config/view.dart';
 import '../shared/app/header_bar.dart';
 import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
+import '../shared/app/scaffold_action.dart';
 import '../shared/app/scaffold_container.dart';
+import '../shared/app/scaffold_page_route_builder.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -53,10 +55,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           action: HeaderBarAction(
                             icon: Icons.add,
                             label: 'Add Cluster Config',
-                            onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ConfigCreate(),
+                            onPressed: () => Navigator.of(context).push(
+                              ScaffoldPageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const ConfigCreate(),
                               ),
                             ),
                           ),
@@ -66,9 +69,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           children: configs.valueOrNull!
                               .map(
                                 (e) => ScaffoldListTile(
-                                  title: Text(
-                                    e.name!,
-                                  ),
+                                  title: e.name!,
                                   trailing: ConfigMenu(config: e),
                                   onTap: () {
                                     final navigator = Navigator.of(context);
@@ -76,8 +77,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                         .read(currentConfigProvider.notifier)
                                         .setConfig(e);
                                     navigator.push(
-                                      MaterialPageRoute(
-                                        builder: (context) => ConfigView(
+                                      ScaffoldPageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                                secondaryAnimation) =>
+                                            ConfigView(
                                           config: e,
                                         ),
                                       ),

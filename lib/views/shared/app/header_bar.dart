@@ -1,39 +1,47 @@
 import 'package:flutter/material.dart';
 
+import 'scaffold_container.dart';
+
 class HeaderBar extends StatelessWidget {
   const HeaderBar({
     super.key,
     required this.title,
+    this.icon,
     this.action,
   });
 
+  final IconData? icon;
   final String title;
   final HeaderBarAction? action;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.primary,
+    final fontSize = Theme.of(context).textTheme.titleLarge!.fontSize!;
+
+    return ScaffoldContainer(
+      height: fontSize + 10,
+      margin: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 16.0),
+      color: Theme.of(context).colorScheme.surface.withAlpha(100),
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ScaffoldContainer(
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            padding: EdgeInsets.only(
+              left: fontSize * 0.5,
+              right: fontSize * 3.5,
+            ),
+            child: Row(
+              children: [
+                if (icon != null) Icon(icon),
+                Text(title, style: Theme.of(context).textTheme.titleLarge),
+              ],
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 16.0,
-          ),
-          child: Row(
-            children: [
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
-              const Spacer(),
-              action?.build(context) ?? const SizedBox.shrink(),
-            ],
-          ),
-        ),
+          const Spacer(),
+          action?.build(context) ?? const SizedBox.shrink(),
+        ],
       ),
     );
   }

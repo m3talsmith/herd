@@ -20,7 +20,6 @@ class AppScaffold extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
-    const padding = 32.0;
 
     return Scaffold(
       body: Container(
@@ -40,10 +39,7 @@ class AppScaffold extends ConsumerWidget {
                 actions: actions,
                 onRefresh: onRefresh,
               ),
-              Padding(
-                padding: const EdgeInsets.all(padding),
-                child: child,
-              ),
+              child,
             ],
           ),
         ),
