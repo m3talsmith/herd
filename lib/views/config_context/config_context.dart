@@ -90,7 +90,9 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
       );
     }).toList();
 
-    final selectedTab = _tabs[_selectedTabIndex].toString().toTitleCase();
+    final selectedTab = _selectedTabIndex == -1
+        ? 'All'
+        : _tabs[_selectedTabIndex].toString().toTitleCase();
 
     Future.delayed(const Duration(milliseconds: 100), () {
       refreshResources();
