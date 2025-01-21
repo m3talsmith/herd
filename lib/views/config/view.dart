@@ -20,6 +20,7 @@ class ConfigView extends ConsumerWidget {
 
     return AppScaffold(
       title: config.name!,
+      showBackButton: true,
       child: SizedBox(
         height: size.height - 136,
         width: size.width,

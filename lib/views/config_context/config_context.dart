@@ -8,6 +8,7 @@ import '../../providers/configs.dart';
 import '../shared/app/header_bar.dart';
 import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
+import '../shared/app/scaffold_action.dart';
 
 class ConfigContextView extends ConsumerStatefulWidget {
   const ConfigContextView({super.key, required this.configContext});
@@ -44,6 +45,7 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
     return AppScaffold(
       title:
           SymbolName(widget.configContext.name).toHumanizedName().toTitleCase(),
+      showBackButton: true,
       child: SizedBox(
         height: size.height - 106,
         width: size.width,
@@ -83,6 +85,12 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
                   children: [
                     HeaderBar(
                       title: selectedTab,
+                      action: ScaffoldAction.primary(
+                        context: context,
+                        icon: Icons.add,
+                        label: 'Add a ${selectedTab.toSingularForm()}',
+                        onPressed: () => {},
+                      ),
                     ),
                     Expanded(
                       child: ScaffoldContainer(

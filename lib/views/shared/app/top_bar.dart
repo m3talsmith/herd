@@ -12,19 +12,20 @@ class TopBarView extends ConsumerWidget {
     this.title,
     this.actions = const [],
     this.onRefresh,
+    this.showBackButton = false,
   });
 
   final String? title;
   final List<Widget> actions;
   final Function()? onRefresh;
+  final bool? showBackButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navigator = Navigator.of(context);
 
-    final canPop = navigator.canPop();
     final listedActions = <Widget>[
-      if (canPop)
+      if (showBackButton!)
         ScaffoldAction(
           color: Theme.of(context).colorScheme.primary,
           iconColor: Theme.of(context).colorScheme.onPrimary,
@@ -35,8 +36,9 @@ class TopBarView extends ConsumerWidget {
       if (actions.isNotEmpty) ...actions,
     ];
 
-    final canDisplay =
-        (canPop || onRefresh != null) || title != null || actions.isNotEmpty;
+    final canDisplay = (showBackButton! || onRefresh != null) ||
+        title != null ||
+        actions.isNotEmpty;
     final fontSize = Theme.of(context).textTheme.titleLarge!.fontSize!;
 
     final width = MediaQuery.of(context).size.width;

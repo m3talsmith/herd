@@ -10,12 +10,14 @@ class AppScaffold extends ConsumerWidget {
     this.title,
     this.actions = const [],
     this.onRefresh,
+    this.showBackButton = false,
   });
 
   final Widget child;
   final String? title;
   final List<Widget> actions;
   final Function()? onRefresh;
+  final bool? showBackButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,6 +40,7 @@ class AppScaffold extends ConsumerWidget {
                 title: title,
                 actions: actions,
                 onRefresh: onRefresh,
+                showBackButton: showBackButton,
               ),
               child,
             ],

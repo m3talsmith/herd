@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'scaffold_action.dart';
 import 'scaffold_container.dart';
 
 class HeaderBar extends StatelessWidget {
@@ -12,7 +13,7 @@ class HeaderBar extends StatelessWidget {
 
   final IconData? icon;
   final String title;
-  final HeaderBarAction? action;
+  final ScaffoldAction? action;
 
   @override
   Widget build(BuildContext context) {

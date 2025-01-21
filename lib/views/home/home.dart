@@ -52,7 +52,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       children: [
                         HeaderBar(
                           title: 'Clusters',
-                          action: HeaderBarAction(
+                          action: ScaffoldAction.primary(
+                            context: context,
                             icon: Icons.add,
                             label: 'Add Cluster Config',
                             onPressed: () => Navigator.of(context).push(
