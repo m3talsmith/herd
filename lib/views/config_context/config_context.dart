@@ -105,56 +105,141 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
       child: SizedBox(
         height: size.height - 106,
         width: size.width,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16,
-          children: [
-            Expanded(
-              child: !_isExpanded
-                  ? StaggeredGrid.count(
-                      crossAxisCount: size.width ~/ 300,
-                      children: formattedTabs,
-                    )
-                  : ListView(
-                      shrinkWrap: true,
-                      children: formattedTabs,
+        child: size.width > 700
+            ? _DesktopView(
+                isExpanded: _isExpanded,
+                tabs: formattedTabs,
+                selectedTab: selectedTab,
+              )
+            : _MobileView(
+                isExpanded: _isExpanded,
+                tabs: formattedTabs,
+                selectedTab: selectedTab,
+              ),
+      ),
+    );
+  }
+}
+
+class _DesktopView extends ConsumerWidget {
+  const _DesktopView({
+    required this.isExpanded,
+    required this.tabs,
+    required this.selectedTab,
+  });
+
+  final bool isExpanded;
+  final List<Widget> tabs;
+  final String selectedTab;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final size = MediaQuery.of(context).size;
+    final resourcesResult = ref.watch(resourcesProvider);
+    final resources = resourcesResult.valueOrNull ?? [];
+
+    return Row(
+      children: [
+        Expanded(
+            child: !isExpanded
+                ? StaggeredGrid.count(
+                    crossAxisCount: size.width ~/ 300,
+                    children: tabs,
+                  )
+                : ListView(
+                    shrinkWrap: true,
+                    children: tabs,
+                  )),
+        if (isExpanded)
+          Expanded(
+            flex: 3,
+            child: Column(
+              children: [
+                if (selectedTab != 'All')
+                  HeaderBar(
+                    title: selectedTab,
+                    action: ScaffoldAction.primary(
+                      context: context,
+                      icon: Icons.add,
+                      label: 'Add a ${selectedTab.toSingularForm()}',
+                      onPressed: () => {},
                     ),
+                  ),
+                Expanded(
+                  child: ScaffoldContainer(
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.all(8),
+                    child: SizedBox(
+                      height: size.height - 106,
+                      width: size.width * 0.7,
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: resources.map((e) => Text(e.kind!)).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            if (_isExpanded)
-              Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    HeaderBar(
-                      title: selectedTab,
-                      action: ScaffoldAction.primary(
-                        context: context,
-                        icon: Icons.add,
-                        label: 'Add a ${selectedTab.toSingularForm()}',
-                        onPressed: () => {},
-                      ),
-                    ),
-                    Expanded(
-                      child: ScaffoldContainer(
-                        padding: const EdgeInsets.all(16),
-                        margin: const EdgeInsets.all(8),
-                        child: SizedBox(
-                          height: size.height - 106,
-                          width: size.width * 0.7,
-                          child: ListView(
-                            shrinkWrap: true,
-                            children:
-                                resources.map((e) => Text(e.kind!)).toList(),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+          ),
+      ],
+    );
+  }
+}
+
+class _MobileView extends ConsumerWidget {
+  const _MobileView({
+    required this.isExpanded,
+    required this.tabs,
+    required this.selectedTab,
+  });
+
+  final bool isExpanded;
+  final List<Widget> tabs;
+  final String selectedTab;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final size = MediaQuery.of(context).size;
+    final resourcesResult = ref.watch(resourcesProvider);
+    final resources = resourcesResult.valueOrNull ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 16,
+      children: [
+        if (selectedTab != 'All')
+          HeaderBar(
+            title: selectedTab,
+            action: ScaffoldAction.primary(
+              context: context,
+              icon: Icons.add,
+              label: selectedTab.toSingularForm(),
+              onPressed: () => {},
+            ),
+          ),
+        Expanded(
+            child: ListView(
+          shrinkWrap: true,
+          children: tabs,
+        )),
+        if (isExpanded)
+          Expanded(
+            flex: 3,
+            child: ScaffoldContainer(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(8),
+              child: SizedBox(
+                height: size.height - 106,
+                width: size.width,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: resources.map((e) => Text(e.kind!)).toList(),
                 ),
               ),
-          ],
-        ),
-      ),
+            ),
+          ),
+      ],
     );
   }
 }

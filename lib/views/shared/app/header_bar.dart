@@ -18,6 +18,7 @@ class HeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = Theme.of(context).textTheme.titleLarge!.fontSize!;
+    final size = MediaQuery.of(context).size;
 
     return ScaffoldContainer(
       height: fontSize + 10,
@@ -30,9 +31,10 @@ class HeaderBar extends StatelessWidget {
           ScaffoldContainer(
             borderRadius: const BorderRadius.all(Radius.circular(20)),
             padding: EdgeInsets.only(
-              left: fontSize * 0.5,
-              right: fontSize * 3.5,
+              left: fontSize,
+              right: fontSize,
             ),
+            height: fontSize + 10,
             child: Row(
               children: [
                 if (icon != null) Icon(icon),

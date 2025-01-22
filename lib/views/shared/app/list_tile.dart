@@ -47,18 +47,26 @@ class ScaffoldListTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: textColor,
-                        ),
+                  SizedBox(
+                    width: 200,
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: textColor,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                    ),
                   ),
                   if (subtitle != null)
-                    Text(
-                      subtitle!,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: textColor,
-                          ),
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        subtitle!,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: textColor,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                      ),
                     ),
                 ],
               ),
