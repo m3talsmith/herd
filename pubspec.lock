@@ -270,6 +270,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1+7"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "5598aa796bbf4699afd5c67c0f5f6e2ed542afc956884b9cd58c306966efc260"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.7.0"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "33259a9276d6cea88774a0000cfae0d861003497755969c92faa223108620dc8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   drift:
     dependency: "direct main"
     description:
@@ -528,10 +544,27 @@ packages:
   kuberneteslib:
     dependency: "direct main"
     description:
-      path: "../kuberneteslib"
-      relative: true
-    source: path
-    version: "0.8.16"
+      name: kuberneteslib
+      sha256: dcb084a326fa1a1c7fdd16547a4d664a3d24f83072ebd0f8c47a6365cc41f5d3
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.18"
+  kuberneteslib_io:
+    dependency: "direct main"
+    description:
+      name: kuberneteslib_io
+      sha256: ff68294a892dc6983d511ad0a46fc29dc22b391af81ba751601cf4fd2416e82b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
+  kuberneteslib_web:
+    dependency: "direct main"
+    description:
+      name: kuberneteslib_web
+      sha256: e9e0ab47059d8eb72fb97a7794ec977511bef0efd241d80f15dbed51ba71caed
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   leak_tracker:
     dependency: transitive
     description:

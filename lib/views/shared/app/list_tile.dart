@@ -26,6 +26,8 @@ class ScaffoldListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return ScaffoldContainer(
       borderColor: borderColor,
       margin: const EdgeInsets.all(8.0),
@@ -43,32 +45,28 @@ class ScaffoldListTile extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 32.0),
                   child: leading,
                 ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 200,
-                    child: Text(
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: textColor,
                             overflow: TextOverflow.ellipsis,
                           ),
                     ),
-                  ),
-                  if (subtitle != null)
-                    SizedBox(
-                      width: 200,
-                      child: Text(
+                    if (subtitle != null)
+                      Text(
                         subtitle!,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: textColor,
                               overflow: TextOverflow.ellipsis,
                             ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
               if (trailing != null) ...[
                 const Spacer(),

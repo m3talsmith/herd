@@ -34,7 +34,7 @@ class ScaffoldAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final fontSize = Theme.of(context).textTheme.titleLarge!.fontSize!;
     final height = fontSize + 10;
-
+    final width = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: onPressed,
       child: ScaffoldContainer(
@@ -46,11 +46,12 @@ class ScaffoldAction extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, color: iconColor),
-            if (label != null)
+            if (label != null && width > 650)
               Text(
                 label!,
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: labelColor,
+                      overflow: TextOverflow.ellipsis,
                     ),
               ),
           ],

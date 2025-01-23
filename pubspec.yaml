@@ -46,10 +46,9 @@ dependencies:
   json2yaml: ^3.0.1
   pluralize: ^0.0.8
   humanizer: ^3.0.1
-  # kuberneteslib: ^0.6.0
-  kuberneteslib:
-    # git: https://github.com/m3talsmith/kuberneteslib.git
-    path: ../kuberneteslib
+  kuberneteslib: ^0.8.18
+  kuberneteslib_io: ^0.1.0
+  kuberneteslib_web: ^0.1.0
   flutter_staggered_grid_view: ^0.7.0
   drift: ^2.23.1
   drift_flutter: ^0.2.4

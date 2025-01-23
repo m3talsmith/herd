@@ -71,10 +71,10 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
       final index = _tabs.indexOf(e);
       final isSelected = _selectedTabIndex == index;
       return ScaffoldListTile(
-        borderColor: isSelected ? Theme.of(context).colorScheme.primary : null,
+        borderColor: isSelected ? null : Theme.of(context).colorScheme.tertiary,
         textColor: isSelected ? Theme.of(context).colorScheme.onPrimary : null,
         title: e,
-        tileColor: isSelected ? Theme.of(context).colorScheme.primary : null,
+        tileColor: isSelected ? Theme.of(context).colorScheme.tertiary : null,
         onTap: () {
           setState(() {
             if (isSelected) {

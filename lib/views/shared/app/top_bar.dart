@@ -80,27 +80,28 @@ class TopBarView extends ConsumerWidget {
                     ],
                   ),
                 ),
-                if (title != null && width > 600) ...[
-                  const Spacer(),
-                  ScaffoldContainer(
-                    height: barHeight,
-                    padding: EdgeInsets.only(
-                      right: fontSize * 0.5,
-                    ),
-                    color: Colors.transparent,
-                    child: Text(
-                      title!,
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimary
-                                .withAlpha(150),
-                            fontWeight: FontWeight.normal,
-                          ),
-                      textAlign: TextAlign.right,
+                if (title != null && width > 650)
+                  Expanded(
+                    child: ScaffoldContainer(
+                      height: barHeight,
+                      padding: EdgeInsets.only(
+                        right: fontSize * 0.5,
+                      ),
+                      color: Colors.transparent,
+                      child: Text(
+                        title!,
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary
+                                  .withAlpha(150),
+                              fontWeight: FontWeight.normal,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        textAlign: TextAlign.right,
+                      ),
                     ),
                   ),
-                ],
               ],
             ),
           )
