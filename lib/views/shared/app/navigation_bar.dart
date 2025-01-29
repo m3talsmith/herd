@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ScaffoldNavigationBar extends StatelessWidget {
-  const ScaffoldNavigationBar({super.key, required this.children});
+  const ScaffoldNavigationBar({
+    super.key,
+    required this.children,
+    this.showLabels = false,
+    this.height,
+  });
 
   final List<ScaffoldNavigationBarItem> children;
+  final bool showLabels;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +24,16 @@ class ScaffoldNavigationBar extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children:
-              children.map((e) => Expanded(child: e.build(context))).toList(),
+        child: SizedBox(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: children.map((e) {
+              e.showLabel = showLabels;
+              return Expanded(
+                child: e.build(context),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
@@ -28,18 +41,20 @@ class ScaffoldNavigationBar extends StatelessWidget {
 }
 
 class ScaffoldNavigationBarItem extends StatelessWidget {
-  const ScaffoldNavigationBarItem({
+  ScaffoldNavigationBarItem({
     super.key,
     required this.icon,
     required this.label,
     this.isSelected = false,
     this.onTap,
+    this.showLabel = false,
   });
 
   final IconData icon;
   final String label;
   final bool isSelected;
   final VoidCallback? onTap;
+  bool showLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +62,32 @@ class ScaffoldNavigationBarItem extends StatelessWidget {
       onTap: onTap,
       child: Tooltip(
         message: label,
-        child: Icon(
-          icon,
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.tertiary,
-        ),
+        child: showLabel
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.tertiary,
+                  ),
+                  Text(
+                    label,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.tertiary,
+                        ),
+                  ),
+                ],
+              )
+            : Icon(
+                icon,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.tertiary,
+              ),
       ),
     );
   }

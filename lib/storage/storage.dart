@@ -4,8 +4,11 @@ import 'dart:developer';
 import 'package:herd/models/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/window_preferences.dart';
+
 enum StorageKey {
   configs,
+  windowPreferences,
 }
 
 class Storage {
@@ -39,5 +42,21 @@ class Storage {
   static Future<void> deleteConfig(Config config) async {
     configs.remove(config);
     await saveConfigs();
+  }
+
+  static Future<void> saveWindowPreferences(
+      WindowPreferences preferences) async {
+    await data?.setString(
+        StorageKey.windowPreferences.name, jsonEncode(preferences.toJson()));
+  }
+
+  static WindowPreferences? loadWindowPreferences() {
+    final preferences = data?.getString(StorageKey.windowPreferences.name);
+    if (preferences != null) {
+      final windowPreferences =
+          WindowPreferences.fromJson(jsonDecode(preferences));
+      return windowPreferences;
+    }
+    return null;
   }
 }

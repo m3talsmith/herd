@@ -1,12 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:herd/providers/resources.dart';
 import 'package:herd/views/shared/app/scaffold_container.dart';
+import 'package:herd/views/shared/app/scaffold_page_route_builder.dart';
 import 'package:humanizer/humanizer.dart';
 import 'package:kuberneteslib/kuberneteslib.dart' as k8s;
 import '../../models/context.dart';
 import '../../providers/configs.dart';
+import '../resources/view.dart';
 import '../shared/app/header_bar.dart';
 import '../shared/app/list_tile.dart';
 import '../shared/app/scaffold.dart';
@@ -40,7 +43,7 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
       return parts.join(' ').toTitleCase();
     }).toList();
 
-    // refreshResources();
+    refreshResources();
   }
 
   refreshResources() async {
@@ -62,9 +65,6 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
 
   @override
   Widget build(BuildContext context) {
-    final resourcesResult = ref.watch(resourcesProvider);
-    final resources = resourcesResult.valueOrNull ?? [];
-
     final size = MediaQuery.of(context).size;
 
     final formattedTabs = _tabs.map((e) {
@@ -142,9 +142,14 @@ class _DesktopView extends ConsumerWidget {
       children: [
         Expanded(
             child: !isExpanded
-                ? StaggeredGrid.count(
-                    crossAxisCount: size.width ~/ 300,
-                    children: tabs,
+                ? CustomScrollView(
+                    slivers: [
+                      SliverGrid.count(
+                        crossAxisCount: size.width ~/ 300,
+                        childAspectRatio: 8,
+                        children: tabs,
+                      ),
+                    ],
                   )
                 : ListView(
                     shrinkWrap: true,
@@ -169,12 +174,37 @@ class _DesktopView extends ConsumerWidget {
                   child: ScaffoldContainer(
                     padding: const EdgeInsets.all(16),
                     margin: const EdgeInsets.all(8),
+                    color: Theme.of(context).colorScheme.surface.withAlpha(100),
                     child: SizedBox(
                       height: size.height - 106,
                       width: size.width * 0.7,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: resources.map((e) => Text(e.kind!)).toList(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomScrollView(
+                          shrinkWrap: true,
+                          slivers: [
+                            SliverGrid.count(
+                              crossAxisCount: size.width ~/ 300,
+                              childAspectRatio: 2,
+                              children: resources.map((e) {
+                                return ScaffoldListTile(
+                                  title: e.metadata!.name!,
+                                  subtitle: e.metadata!.namespace,
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    ScaffoldPageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          ResourceView(
+                                        resource: e,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

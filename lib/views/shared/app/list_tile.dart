@@ -26,8 +26,6 @@ class ScaffoldListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return ScaffoldContainer(
       borderColor: borderColor,
       margin: const EdgeInsets.all(8.0),

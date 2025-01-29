@@ -18,41 +18,37 @@ class HeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = Theme.of(context).textTheme.titleLarge!.fontSize!;
-    final width = MediaQuery.of(context).size.width;
+
     return ScaffoldContainer(
       height: fontSize + 10,
       margin: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 16.0),
       color: Theme.of(context).colorScheme.surface.withAlpha(100),
       borderRadius: const BorderRadius.all(Radius.circular(20)),
-      child: Flexible(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ScaffoldContainer(
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
-              padding: EdgeInsets.only(
-                left: fontSize,
-                right: fontSize,
-              ),
-              height: fontSize + 10,
-              child: Flex(
-                direction: Axis.horizontal,
-                clipBehavior: Clip.hardEdge,
-                children: [
-                  if (icon != null) Icon(icon),
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                  ),
-                ],
-              ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ScaffoldContainer(
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            padding: EdgeInsets.only(
+              left: fontSize,
+              right: fontSize,
             ),
-            const Spacer(),
-            action?.build(context) ?? const SizedBox.shrink(),
-          ],
-        ),
+            height: fontSize + 10,
+            child: Row(
+              children: [
+                if (icon != null) Icon(icon),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          action?.build(context) ?? const SizedBox.shrink(),
+        ],
       ),
     );
   }

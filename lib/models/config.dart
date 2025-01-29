@@ -96,8 +96,6 @@ class Config {
   parseContent() {
     final data = yamlParser.loadYaml(content!);
 
-    log('data: ${data.keys}');
-
     final localClusters = <Cluster>[];
     final localContexts = <ConfigContext>[];
     final localUsers = <User>[];
