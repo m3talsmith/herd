@@ -1,22 +1,23 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:platform/platform.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
 import 'providers/window.dart';
 import 'storage/storage.dart';
-import 'utils/window.dart';
-import 'utils/window_preferences.dart';
+// import 'utils/window.dart';
+// import 'utils/window_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Storage.ensureInitialized();
   Storage.loadConfigs();
-  Storage.loadWindowPreferences();
-
-  bool isFullscreen = false;
-  WindowPreferences? preferences;
+  final preferences = Storage.loadWindowPreferences();
+  bool isFullscreen = preferences?.fullscreen ?? false;
 
   if (!kIsWeb) {
     const platform = LocalPlatform();
@@ -24,11 +25,22 @@ void main() async {
         platform.isWindows ||
         platform.isLinux ||
         platform.isFuchsia) {
-      final window = Window();
-      await window.ensureInitialized();
+      // final window = Window();
+      // await window.ensureInitialized();
 
-      isFullscreen = window.fullscreen;
-      preferences = window.preferences;
+      await windowManager.ensureInitialized();
+      final windowOptions = WindowOptions(
+        size: preferences?.windowSize,
+        title: 'Herd',
+      );
+
+      log('Setting position: ${preferences?.windowPosition?.left}, ${preferences?.windowPosition?.top}');
+      windowManager.setPosition(Offset(preferences?.windowPosition?.left ?? 0, preferences?.windowPosition?.top ?? 0));
+
+      await windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
     }
   }
 
@@ -42,7 +54,7 @@ void main() async {
           (ref) => preferences,
         ),
       ],
-      child: App(),
+      child: const App(),
     ),
   );
 }

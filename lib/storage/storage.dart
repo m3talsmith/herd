@@ -46,12 +46,14 @@ class Storage {
 
   static Future<void> saveWindowPreferences(
       WindowPreferences preferences) async {
+    log('saving window preferences: ${preferences.toJson()}');
     await data?.setString(
         StorageKey.windowPreferences.name, jsonEncode(preferences.toJson()));
   }
 
   static WindowPreferences? loadWindowPreferences() {
     final preferences = data?.getString(StorageKey.windowPreferences.name);
+    log('loading window preferences: $preferences');
     if (preferences != null) {
       final windowPreferences =
           WindowPreferences.fromJson(jsonDecode(preferences));

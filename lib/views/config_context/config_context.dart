@@ -47,7 +47,7 @@ class _ConfigContextViewState extends ConsumerState<ConfigContextView> {
   }
 
   refreshResources() async {
-    final config = ref.watch(currentConfigProvider);
+    final config = ref.read(currentConfigProvider);
     final k8sConfig = config!.toK8sConfig();
     final context = config.contextByName(widget.configContext.name);
 
